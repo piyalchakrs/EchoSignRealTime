@@ -179,4 +179,4 @@ MIT License. See `LICENSE` for full text.
 
 ## Author
 
-Tasir Mahtab Haque
+Piyal Chakraborty, Tasir Mahtab Haque
