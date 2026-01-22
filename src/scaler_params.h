@@ -1,0 +1,13 @@
+#pragma once
+#include <Arduino.h>
+
+#define NUM_FEATURES 12
+
+static const float SCALER_MEAN[NUM_FEATURES] = { 2614.344053f, 2612.986233f, 2486.240285f, 2687.731896f, 2591.814071f, 1522.673217f, -595.302102f, 12994.638646f, 4956.748277f, 624.510115f, -11.455126f, -6.402956f };
+static const float SCALER_SCALE[NUM_FEATURES] = { 232.024558f, 149.552968f, 191.352775f, 125.599487f, 223.058590f, 2294.578719f, 5839.158628f, 3951.495045f, 5298.492280f, 1288.407236f, 2045.060270f, 1162.400731f };
+
+inline void standardizeFeatures(float feat[NUM_FEATURES]) {
+  for (int i = 0; i < NUM_FEATURES; ++i) {
+    feat[i] = (feat[i] - SCALER_MEAN[i]) / SCALER_SCALE[i];
+  }
+}

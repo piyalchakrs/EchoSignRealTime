@@ -1,0 +1,92 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run Web UI",
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"${workspaceFolder}/tools/web_ui.py"
+			],
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"focus": true,
+				"clear": false
+			},
+			"isBackground": true,
+			"group": {
+				"kind": "test",
+				"isDefault": false
+			}
+		},
+		{
+			"label": "Run Data Collection",
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"${workspaceFolder}/tools/collect_gesture_data.py"
+			],
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"focus": true
+			}
+		},
+		{
+			"label": "Train KNN Model",
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"${workspaceFolder}/tools/train_knn.py",
+				"${workspaceFolder}/data/dataset.csv"
+			],
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"focus": true
+			}
+		},
+		{
+			"label": "Parse and Train",
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"${workspaceFolder}/tools/parse_and_train.py"
+			],
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"focus": true
+			}
+		},
+		{
+			"label": "Merge Logs",
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"${workspaceFolder}/tools/merge_logs.py"
+			],
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"focus": true
+			}
+		},
+		{
+			"label": "Train Sentence KNN Model",
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"${workspaceFolder}/tools/train_sentence_knn.py"
+			],
+			"isBackground": false,
+			"group": "build"
+		}
+	]
+}

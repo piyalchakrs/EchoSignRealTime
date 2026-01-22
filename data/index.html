@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EchoSign - Gesture Recognition</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- GSAP for smooth animations -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+    <!-- Three.js module imports -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.157.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.157.0/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <path d="M16 4L4 10V22L16 28L28 22V10L16 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                    <circle cx="16" cy="16" r="4" fill="currentColor"/>
+                </svg>
+                <h1>EchoSign</h1>
+            </div>
+            <div class="status-indicator">
+                <span class="status-dot" id="statusDot"></span>
+                <span id="statusText">Connecting...</span>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Two column layout: 3D Model + Predictions -->
+            <div class="two-column-layout">
+                <!-- Left Column: 3D Hand Model -->
+                <section class="hand-3d-container">
+                    <div class="hand-3d-header">
+                        <h2 class="section-title">3D Hand Model</h2>
+                        <div class="hand-3d-controls">
+                            <button id="resetCamera" class="control-btn" title="Reset Camera">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                                    <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="hand3d" class="hand-3d-canvas"></div>
+                    <div class="hand-3d-info">
+                        <span>Click and drag to rotate • Scroll to zoom</span>
+                    </div>
+                </section>
+
+                <!-- Right Column: Predictions & Metrics -->
+                <div class="prediction-column">
+                    <section class="gesture-display">
+                <div class="gesture-card">
+                    <div class="mode-toggle">
+                        <button id="gestureBtn" class="mode-btn active">👆 Gesture Mode</button>
+                        <button id="sentenceBtn" class="mode-btn">🗣 Sentence Mode</button>
+                        <label class="mode-btn" style="margin-left:8px; display:flex; align-items:center; gap:6px;">
+                            <input type="checkbox" id="voiceToggle" />
+                            🔊 Voice
+                        </label>
+                    </div>
+                    <div class="gesture-name" id="gestureName">—</div>
+                    <div class="gesture-confidence">
+                        <span>Confidence</span>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" id="confidenceFill"></div>
+                        </div>
+                        <span id="confidenceValue">—</span>
+                    </div>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">Motion (GDP)</div>
+                        <div class="metric-value" id="gdpValue">—</div>
+                        <div class="metric-bar">
+                            <div class="metric-fill" id="gdpBar"></div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Samples</div>
+                        <div class="metric-value" id="sampleCount">0</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Predictions/sec</div>
+                        <div class="metric-value" id="predRate">0</div>
+                    </div>
+                </div>
+            </section>
+
+                    <section class="sensor-panel">
+                <h2 class="section-title">Flex Sensors</h2>
+                <div class="sensors-grid">
+                    <div class="sensor-item">
+                        <label>Thumb</label>
+                        <div class="sensor-bar">
+                            <div class="sensor-fill" id="thumbBar"></div>
+                        </div>
+                        <span id="thumbVal">—</span>
+                    </div>
+                    <div class="sensor-item">
+                        <label>Index</label>
+                        <div class="sensor-bar">
+                            <div class="sensor-fill" id="indexBar"></div>
+                        </div>
+                        <span id="indexVal">—</span>
+                    </div>
+                    <div class="sensor-item">
+                        <label>Middle</label>
+                        <div class="sensor-bar">
+                            <div class="sensor-fill" id="middleBar"></div>
+                        </div>
+                        <span id="middleVal">—</span>
+                    </div>
+                    <div class="sensor-item">
+                        <label>Ring</label>
+                        <div class="sensor-bar">
+                            <div class="sensor-fill" id="ringBar"></div>
+                        </div>
+                        <span id="ringVal">—</span>
+                    </div>
+                    <div class="sensor-item">
+                        <label>Pinky</label>
+                        <div class="sensor-bar">
+                            <div class="sensor-fill" id="pinkyBar"></div>
+                        </div>
+                        <span id="pinkyVal">—</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="imu-panel">
+                <h2 class="section-title">IMU Data</h2>
+                <div class="imu-grid">
+                    <div class="imu-group">
+                        <h3>Accelerometer (g)</h3>
+                        <div class="imu-values">
+                            <div class="imu-item">
+                                <span class="imu-axis">X</span>
+                                <span id="accelX">—</span>
+                            </div>
+                            <div class="imu-item">
+                                <span class="imu-axis">Y</span>
+                                <span id="accelY">—</span>
+                            </div>
+                            <div class="imu-item">
+                                <span class="imu-axis">Z</span>
+                                <span id="accelZ">—</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="imu-group">
+                        <h3>Gyroscope (°/s)</h3>
+                        <div class="imu-values">
+                            <div class="imu-item">
+                                <span class="imu-axis">X</span>
+                                <span id="gyroX">—</span>
+                            </div>
+                            <div class="imu-item">
+                                <span class="imu-axis">Y</span>
+                                <span id="gyroY">—</span>
+                            </div>
+                            <div class="imu-item">
+                                <span class="imu-axis">Z</span>
+                                <span id="gyroZ">—</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+                    <section class="history-panel">
+                        <h2 class="section-title">Recent Gestures</h2>
+                        <div class="history-list" id="historyList">
+                            <div class="history-empty">Waiting for gestures...</div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <span>EchoSign Realtime v1.0</span>
+            <span>•</span>
+            <span id="deviceInfo">ESP32</span>
+        </footer>
+    </div>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>
